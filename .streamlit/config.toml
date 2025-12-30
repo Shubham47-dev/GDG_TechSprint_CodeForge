@@ -1,8 +1,8 @@
 [theme]
-primaryColor = "#28255fff"   # A professional Indigo/Purple (instead of default red)
-backgroundColor = "#000000ff" # Clean White
-secondaryBackgroundColor = "#050b16ff" # Light Gray for sidebar
-textColor = "#e8f7f7ff"       # Dark Gray (easier to read than pure black)
+primaryColor = "#8b5cf6"  # A professional Indigo/Purple (instead of default red)
+backgroundColor = "#000000ff" 
+secondaryBackgroundColor = "#050b16ff"
+textColor = "#e8f7f7ff"     
 font = "sans serif"         # Modern font
 
 [server]
