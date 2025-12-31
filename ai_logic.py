@@ -7,11 +7,6 @@ from dotenv import load_dotenv
 load_dotenv()
 API_KEY = os.getenv("GEMINI_API_KEY")
 
-if not API_KEY:
-    print("❌ ERROR: API Key is None! Check your .env file path.")
-else:
-    print(f"✅ API Key found! It starts with: {API_KEY[:5]}...")
-
 genai.configure(api_key = API_KEY)
 model = genai.GenerativeModel(
     model_name='gemini-2.5-flash')
@@ -41,7 +36,8 @@ def analyze_resume(resume_text, job_desc):
         "ATS_Readability": (string, strictly one of: "High", "Medium", "Low"),
         "soft_skill": (string, 1-2 sentences analyzing soft skills),
         "advice": (string, 1-2 actionable tip to improve the score),
-        "critical_gaps": (string, 2-3 sentence explaining the biggest missing technical skill)
+        "critical_gaps": (string, 2-3 sentence explaining the biggest missing technical skill),
+        "wts" : (string, few lines stating why this score )
     }}
     """
 

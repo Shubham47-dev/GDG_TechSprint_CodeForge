@@ -118,12 +118,14 @@ if st.button("Analyze Resume Now", type="primary", use_container_width=True):
                 st.markdown(f">{analysis['summary']}")
                 
         
-            
-        with st.expander("🔍 What AI extracted from your Resume"):
-            st.write("Your Resume has", pg, "number of pages.")
-            st.write(resume_text)
-        with st.expander("🔍 What AI concluded"):
-            st.write(analysis)
+        with st.container(border=True):    
+            with st.expander("🔍 What AI extracted from your Resume"):
+                st.write("Your Resume has", pg, "number of pages.")
+                st.write(resume_text)
+            with st.expander("🔍 What AI concluded"):
+                st.write(analysis)
+            with st.expander("🔍 Why This Score"):
+                st.write(analysis['wts'])
 
     elif uploaded_file and not job_desc:
         st.error("⚠️ Please paste the Job Description to start!")
