@@ -2,15 +2,18 @@ import streamlit as st
 import google.generativeai as genai
 import os
 import json
-
-
-if "GEMINI_API_KEY" in st.secrets:
+try:
     API_KEY = st.secrets["GEMINI_API_KEY"]
+    
+except Exception:
 
-else:
     from dotenv import load_dotenv
     load_dotenv()
     API_KEY = os.getenv("GEMINI_API_KEY")
+
+# 3. Final Check
+if not API_KEY:
+    raise ValueError("❌ API Key not found! Check Streamlit Secrets (Cloud) or .env (Local).")
 
 genai.configure(api_key = API_KEY)
 model = genai.GenerativeModel(
