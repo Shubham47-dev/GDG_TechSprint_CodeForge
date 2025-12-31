@@ -11,7 +11,6 @@ except Exception:
     load_dotenv()
     API_KEY = os.getenv("GEMINI_API_KEY")
 
-# 3. Final Check
 if not API_KEY:
     raise ValueError("❌ API Key not found! Check Streamlit Secrets (Cloud) or .env (Local).")
 
