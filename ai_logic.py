@@ -5,7 +5,7 @@ import json
 
 
 if "GEMINI_API_KEY" in st.secrets:
-    api_key = st.secrets["GEMINI_API_KEY"]
+    API_KEY = st.secrets["GEMINI_API_KEY"]
 
 else:
     from dotenv import load_dotenv
@@ -48,7 +48,7 @@ def analyze_resume(resume_text, job_desc):
 
     try:
         response = model.generate_content(prompt_template)
-        
+
         raw_text = response.text.strip()
         
         if raw_text.startswith("```"):
