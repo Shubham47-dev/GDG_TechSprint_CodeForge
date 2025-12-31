@@ -12,22 +12,6 @@ st.set_page_config(
     layout="wide"
 )
 
-
-def mock_ai_analysis(resume_text, job_desc):
-    """Simulates Member 3's AI Analysis"""
-    time.sleep(2) # Fake AI thinking
-    return {
-        "match_percentage": 48,
-        "missing_keywords": ["Python", "Docker", "AWS", "Communication"],
-        "found_count" : 2,
-        "summary": "The candidate has strong technical skills but lacks cloud experience mentioned in the job description.",
-        "ATS_Readability" : "Low",
-        "soft_skill" : "string, explain briefly the required soft skills and what soft skill resume already has",
-        "advice" : "string, briefly advice on how user can improve the score",
-        "critical_gaps" : "string, explain the critical gap between what skill user has and what user is missing using the missing keyword you listed and how important it is for job"
-
-    }
-
 with st.container():
     col_a, col_b = st.columns([3, 1])
     with col_a:
@@ -37,7 +21,7 @@ with st.container():
         st.metric(label="System Status", value="Online", delta="Ready")
 
 with st.sidebar:
-    st.caption("Powered by Google Gemini 1.5 Flash.")
+    st.caption("Powered by Google Gemini 2.5 Flash.")
     st.caption("We do not store your data.")
     st.caption("Built by CodeForge for GDG TechSprint.")
     with st.expander("ℹ️ How to use this app"):
@@ -63,15 +47,14 @@ with st.container(border=True):
 if st.button("Analyze Resume Now", type="primary", use_container_width=True):
 
     if job_desc and uploaded_file:
-        # Showing Spinner "
-        with st.spinner("🔍 Reading PDF and consulting AI..."):
-            
+
+        with st.spinner("📄 Reading PDF..."):
+            time.sleep(2)
             resume_text = pdf_utils.get_text(uploaded_file)
             pg = pdf_utils.resume_len(uploaded_file)
-            
-            # (Later: ai_logic.analyze_resume(resume_text, job_desc))
-            analysis = mock_ai_analysis(resume_text, job_desc)
-            
+        
+        with st.spinner("🤖 Consulting Gemini AI... (This may take 5 seconds)"):
+            analysis = ai_logic.analyze_resume(resume_text, job_desc)
         st.success("Analysis Complete!")
 
         with st.container(border = True):

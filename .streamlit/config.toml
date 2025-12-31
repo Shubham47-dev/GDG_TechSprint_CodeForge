@@ -8,3 +8,4 @@ font = "sans serif"         # Modern font
 [server]
 headless = true
 enableCORS = false
+enableXsrfProtection = false

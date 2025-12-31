@@ -1,16 +1,22 @@
+import streamlit as st 
 import google.generativeai as genai
 import os
 import json
 from dotenv import load_dotenv
 
-# 1. Load the API Key safely
 load_dotenv()
-api_key = os.getenv("GEMINI_API_KEY")
+API_KEY = os.getenv("GEMINI_API_KEY")
 
-# 2. Configure the Model
-# We use 'gemini-1.5-flash' because it's fast and free
-genai.configure(api_key=api_key)
-model = genai.GenerativeModel('gemini-1.5-flash')
+if not API_KEY:
+    print("❌ ERROR: API Key is None! Check your .env file path.")
+else:
+    print(f"✅ API Key found! It starts with: {API_KEY[:5]}...")
+
+genai.configure(api_key = API_KEY)
+model = genai.GenerativeModel(
+    model_name='gemini-2.5-flash')
+
+@st.cache_data
 
 def analyze_resume(resume_text, job_desc):
     prompt_template = f"""
@@ -40,39 +46,44 @@ def analyze_resume(resume_text, job_desc):
     """
 
     try:
-        # B. Make the API Call
         response = model.generate_content(prompt_template)
         
-        # C. Cleaning the Output (The "Safety Net")
-        # Sometimes AI adds ```json ... ``` wrapper even if we tell it not to.
-        # We must strip it to prevent crashes.
         raw_text = response.text.strip()
         
-        # Remove markdown fences if present
         if raw_text.startswith("```"):
-            raw_text = raw_text.replace("```json", "").replace("```", "")
-        
-        # D. Parse JSON
+            raw_text = raw_text.replace("```json", "") 
+            raw_text = raw_text.replace("```", "")
+
         result = json.loads(raw_text)
         
-        # Ensure match_percentage is an integer (sometimes AI gives "85%")
-        if isinstance(result.get("match_percentage"), str):
-            result["match_percentage"] = int(result["match_percentage"].replace("%", ""))
+        if (type(result.get("match_percentage"))==str):
+            result["match_percentage"] = result["match_percentage"].replace("%", "")
+            result["match_percentage"] = int(result["match_percentage"])
+
             
         return result
 
-    except json.JSONDecodeError:
         # If AI returns bad text that isn't JSON
+    except json.JSONDecodeError:
         return {
             "match_percentage": 0,
-            "missing_keywords": ["Error parsing AI response"],
-            "summary": "The AI analysis failed to generate a valid report. Please try again."
+            "missing_keywords": [],
+            "found_count": 0,
+            "summary": "Error parsing AI response. Please try again.",
+            "ATS_Readability": "Low",
+            "soft_skill": "None",
+            "advice": "Please retry the analysis.",
+            "critical_gaps": "System error evaluating resume."
         }
         
     except Exception as e:
-        # General API errors (no internet, bad key, etc.)
         return {
             "match_percentage": 0,
-            "missing_keywords": ["Connection Error"],
-            "summary": f"System Error: {str(e)}"
+            "missing_keywords": [],
+            "found_count": 0,
+            "summary": f"System Error: {str(e)}",
+            "ATS_Readability": "Low",
+            "soft_skill": "None",
+            "advice": "Check your connection or API key.",
+            "critical_gaps": "System error."
         }
