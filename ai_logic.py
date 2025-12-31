@@ -1,7 +1,6 @@
 import streamlit as st 
 import google.generativeai as genai
 import os
-import json
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -13,18 +12,23 @@ model = genai.GenerativeModel(
 
 @st.cache_data(show_spinner=False)
 
-def analyze_resume(resume_text, job_desc):
-    prompt_template = f"""
-    Act as an expert ATS (Applicant Tracking System) and HR Manager.
+def get_gemini_response(resume_text, job_description):
+    """
+    This function takes the resume text and JD, sends it to AI,
+    and returns the AI's analysis.
+    """
     
-    JOB DESCRIPTION:
-    {job_desc}
+    # This is the "Model" - flash is faster and cheaper/free
+    model = genai.GenerativeModel('gemini-2.5-flash')
+
+    # This is the "Prompt" - The instructions you give the AI
+    # You can change this text to make the AI smarter!
+    prompt = f"""
+    Act as a skilled ATS (Applicant Tracking System) scanner with a deep understanding of tech jobs. 
+    Evaluate the resume based on the job description.
     
-    RESUME TEXT:
-    {resume_text}
-    
-    TASK:
-    Evaluate the resume against the job description.
+    Resume Text: {resume_text}
+    Job Description: {job_description}
     
     OUTPUT FORMAT (Strict JSON Only):
     Provide a valid JSON object with exactly these keys:
