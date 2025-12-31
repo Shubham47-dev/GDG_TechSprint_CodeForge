@@ -12,10 +12,11 @@ st.set_page_config(
 with st.container():
     col_a, col_b = st.columns([3, 1])
     with col_a:
-        st.title("JobFit AI | Smart ATS Resume Analyzer 📝")
+        st.write("## **JobFit AI** | Smart ATS Resume Analyzer 📝")
         st.caption("AI-Powered Resume Optimization System")
     with col_b:
         st.metric(label="System Status", value="Online", delta="Ready")
+    st.write("")
 
 with st.sidebar:
     st.caption("Powered by Google Gemini 2.5 Flash.")
