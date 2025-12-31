@@ -48,12 +48,12 @@ if st.button("Analyze Resume Now", type="primary", use_container_width=True):
 
     if job_desc and uploaded_file:
 
-        with st.spinner("📄 Reading PDF..."):
+        with st.spinner("Reading PDF..."):
             time.sleep(2)
             resume_text = pdf_utils.get_text(uploaded_file)
             pg = pdf_utils.resume_len(uploaded_file)
         
-        with st.spinner("🤖 Consulting Gemini AI... (This may take 5 seconds)"):
+        with st.spinner("Consulting Gemini AI..."):
             analysis = ai_logic.analyze_resume(resume_text, job_desc)
         st.success("Analysis Complete!")
 
