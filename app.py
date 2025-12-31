@@ -2,9 +2,6 @@ import streamlit as st
 import pdf_utils
 import ai_logic
 import visuals
-import time
-import altair as alt
-import pandas as pd
 
 st.set_page_config(
     page_title="JobFit AI | Smart Resume Analyzer",
@@ -49,7 +46,6 @@ if st.button("Analyze Resume Now", type="primary", use_container_width=True):
     if job_desc and uploaded_file:
 
         with st.spinner("Reading PDF..."):
-            time.sleep(2)
             resume_text = pdf_utils.get_text(uploaded_file)
             pg = pdf_utils.resume_len(uploaded_file)
         
@@ -75,17 +71,17 @@ if st.button("Analyze Resume Now", type="primary", use_container_width=True):
             with col_c:
                 st.markdown("### Verdict:")
                 if analysis['match_percentage']>=75:
-                    st.write("##### :green-background[✅ Great Match]")
+                    st.write("##### :green[✅ Great Match]")
                 elif analysis['match_percentage']>=50:
-                    st.write("##### :yellow-background[⚠️ Potential Match]")
+                    st.write("##### :yellow[⚠️ Potential Match]")
                 else:
-                    st.write("##### :red-background[❌ Low Match]")
+                    st.write("##### :red[❌ Low Match]")
                 if analysis['ATS_Readability'] == 'High':
-                    st.markdown(f"###### ATS Readability: :green-background[{analysis['ATS_Readability']}]")
+                    st.markdown(f"###### ATS Readability: :green[{analysis['ATS_Readability']}]")
                 elif analysis['ATS_Readability'] == 'Medium':
-                    st.markdown(f"###### ATS Readability: :yellow-background[{analysis['ATS_Readability']}]")
+                    st.markdown(f"###### ATS Readability: :yellow[{analysis['ATS_Readability']}]")
                 elif analysis['ATS_Readability'] == 'Low':
-                    st.markdown(f"###### ATS Readability: :red-background[{analysis['ATS_Readability']}]")
+                    st.markdown(f"###### ATS Readability: :red[{analysis['ATS_Readability']}]")
             st.divider()
         
             col1, col2 = st.columns([1, 1.6])
@@ -98,6 +94,12 @@ if st.button("Analyze Resume Now", type="primary", use_container_width=True):
                 st.write("")
 
                 visuals.plot_keyword_bar(analysis['found_count'],len(analysis['missing_keywords']))
+
+                st.write("")
+                st.divider()
+                st.caption("Why this Score: ")
+
+                st.markdown(f">_{analysis['wts']}_")
 
                 
             with col2:
@@ -117,15 +119,21 @@ if st.button("Analyze Resume Now", type="primary", use_container_width=True):
                 st.markdown("**📝 Summary**")
                 st.markdown(f">{analysis['summary']}")
                 
+        st.divider()
         
-        with st.container(border=True):    
-            with st.expander("🔍 What AI extracted from your Resume"):
-                st.write("Your Resume has", pg, "number of pages.")
-                st.write(resume_text)
-            with st.expander("🔍 What AI concluded"):
-                st.write(analysis)
-            with st.expander("🔍 Why This Score"):
-                st.write(analysis['wts'])
+        with st.container():
+            st.subheader("Raw Data Extracted: ")
+        
+            col1, col2 = st.columns(2)
+        
+            with col1:
+                with st.expander("View Extracted Resume Text"):
+                    st.caption(f"Page Count: {pg}")
+                    st.text_area("Raw Text", resume_text, height=200, disabled=True)
+        
+            with col2:
+                with st.expander("View Raw AI JSON"):
+                    st.json(analysis)
 
     elif uploaded_file and not job_desc:
         st.error("⚠️ Please paste the Job Description to start!")

@@ -11,7 +11,7 @@ genai.configure(api_key = API_KEY)
 model = genai.GenerativeModel(
     model_name='gemini-2.5-flash')
 
-@st.cache_data
+@st.cache_data(show_spinner=False)
 
 def analyze_resume(resume_text, job_desc):
     prompt_template = f"""
@@ -37,7 +37,7 @@ def analyze_resume(resume_text, job_desc):
         "soft_skill": (string, 1-2 sentences analyzing soft skills),
         "advice": (string, 1-2 actionable tip to improve the score),
         "critical_gaps": (string, 2-3 sentence explaining the biggest missing technical skill),
-        "wts" : (string, few lines stating why this score )
+        "wts" : (string, 2-3 short sentences explaining "Why This Score" was given)
     }}
     """
 
@@ -69,7 +69,8 @@ def analyze_resume(resume_text, job_desc):
             "ATS_Readability": "Low",
             "soft_skill": "None",
             "advice": "Please retry the analysis.",
-            "critical_gaps": "System error evaluating resume."
+            "critical_gaps": "System error evaluating resume.",
+            "wts" : "Unable to say"
         }
         
     except Exception as e:
@@ -81,5 +82,6 @@ def analyze_resume(resume_text, job_desc):
             "ATS_Readability": "Low",
             "soft_skill": "None",
             "advice": "Check your connection or API key.",
-            "critical_gaps": "System error."
+            "critical_gaps": "System error.",
+            "wts" : "Unable to say"
         }
