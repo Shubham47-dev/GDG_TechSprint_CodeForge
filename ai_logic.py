@@ -1,13 +1,16 @@
+import streamlit as st 
 import google.generativeai as genai
 import os
 from dotenv import load_dotenv
 
-# 1. Load the secret environment variables
 load_dotenv()
-api_key = os.getenv("GOOGLE_API_KEY")
+API_KEY = os.getenv("GEMINI_API_KEY")
 
-# 2. Configure the AI Model
-genai.configure(api_key=api_key)
+genai.configure(api_key = API_KEY)
+model = genai.GenerativeModel(
+    model_name='gemini-2.5-flash')
+
+@st.cache_data(show_spinner=False)
 
 def get_gemini_response(resume_text, job_description):
     """
@@ -27,22 +30,62 @@ def get_gemini_response(resume_text, job_description):
     Resume Text: {resume_text}
     Job Description: {job_description}
     
-    I want the response in a single string having the structure:
-    {{"JD Match":"%", "MissingKeywords":[], "Profile Summary":""}}
+    OUTPUT FORMAT (Strict JSON Only):
+    Provide a valid JSON object with exactly these keys:
+    {{
+        "match_percentage": (integer between 0-100),
+        "missing_keywords": (list of strings, strictly tech skills),
+        "found_count": (integer, number of matching keywords found),
+        "summary": (string, brief executive summary),
+        "ATS_Readability": (string, strictly one of: "High", "Medium", "Low"),
+        "soft_skill": (string, 1-2 sentences analyzing soft skills),
+        "advice": (string, 1-2 actionable tip to improve the score),
+        "critical_gaps": (string, 2-3 sentence explaining the biggest missing technical skill),
+        "wts" : (string, 2-3 short sentences explaining "Why This Score" was given)
+    }}
     """
 
-    # Send data to AI
-    response = model.generate_content(prompt)
-    
-    return response.text
+    try:
+        response = model.generate_content(prompt_template)
+        
+        raw_text = response.text.strip()
+        
+        if raw_text.startswith("```"):
+            raw_text = raw_text.replace("```json", "") 
+            raw_text = raw_text.replace("```", "")
 
-# --- TESTING SECTION ---
-# This part only runs when you run THIS file directly. 
-# It helps you test without needing the other members.
-if __name__ == "__main__":
-    fake_resume = "I am a python developer with 3 years experience in AI."
-    fake_jd = "Looking for a python developer who knows AI and Streamlit."
-    
-    print("Sending to AI... please wait...")
-    result = get_gemini_response(fake_resume, fake_jd)
-    print("AI Response:\n", result)
+        result = json.loads(raw_text)
+        
+        if (type(result.get("match_percentage"))==str):
+            result["match_percentage"] = result["match_percentage"].replace("%", "")
+            result["match_percentage"] = int(result["match_percentage"])
+
+            
+        return result
+
+        # If AI returns bad text that isn't JSON
+    except json.JSONDecodeError:
+        return {
+            "match_percentage": 0,
+            "missing_keywords": [],
+            "found_count": 0,
+            "summary": "Error parsing AI response. Please try again.",
+            "ATS_Readability": "Low",
+            "soft_skill": "None",
+            "advice": "Please retry the analysis.",
+            "critical_gaps": "System error evaluating resume.",
+            "wts" : "Unable to say"
+        }
+        
+    except Exception as e:
+        return {
+            "match_percentage": 0,
+            "missing_keywords": [],
+            "found_count": 0,
+            "summary": f"System Error: {str(e)}",
+            "ATS_Readability": "Low",
+            "soft_skill": "None",
+            "advice": "Check your connection or API key.",
+            "critical_gaps": "System error.",
+            "wts" : "Unable to say"
+        }
