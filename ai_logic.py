@@ -13,7 +13,7 @@ except Exception:
     API_KEY = os.getenv("GEMINI_API_KEY")
 
 if not API_KEY:
-    raise ValueError("❌ API Key not found! Check Streamlit Secrets (Cloud) or .env (Local).")
+    raise ValueError("API Key not found! Check Streamlit Secrets (Cloud) or .env (Local).")
 
 genai.configure(api_key = API_KEY)
 model = genai.GenerativeModel(
