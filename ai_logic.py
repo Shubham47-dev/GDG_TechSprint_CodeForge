@@ -23,7 +23,7 @@ model = genai.GenerativeModel(
 
 def analyze_resume(resume_text, job_desc):
     prompt_template = f"""
-    Act as an expert ATS (Applicant Tracking System) and HR Manager.
+    Act as an experienced HR Manager and Technical Recruiter.
     
     JOB DESCRIPTION:
     {job_desc}
@@ -32,7 +32,16 @@ def analyze_resume(resume_text, job_desc):
     {resume_text}
     
     TASK:
-    Evaluate the resume against the job description.
+    Evaluate the resume against the job description. 
+    
+    SCORING RULES:
+    - 80-100%: Perfect match (Exact skills + Experience).
+    - 50-79%: Potential match (Has related/transferable skills, e.g., Java instead of Node.js, or Strong CS fundamentals).
+    - 0-49%: Low match (Completely different field, e.g., HR applying for Engineering).
+    
+    CRITICAL INSTRUCTION:
+    Do not just look for exact keyword matches. Evaluate "Transferable Skills". 
+    (Example: If Job asks for 'React' but Candidate knows 'Angular' and 'JavaScript', that is a partial match, not zero).
     
     OUTPUT FORMAT (Strict JSON Only):
     Provide a valid JSON object with exactly these keys:
